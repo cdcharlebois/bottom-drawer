@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<widget id="mendix.bottomdrawer.BottomDrawer" pluginWidget="true" needsEntityContext="true" offlineCapable="true"
+        supportedPlatform="Native"
+        xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../node_modules/mendix/custom_widget.xsd">
+    <name>Bottom Drawer</name>
+    <description>My widget description</description>
+    <icon/>
+    <properties>
+        <property key="showHandle" type="boolean" defaultValue="true">
+            <caption>Show handle</caption>
+            <category>General</category>
+            <description>Renders a small horizontal handle at the top of the drawer.</description>
+        </property>
+        <property key="showArrows" type="boolean" defaultValue="false">
+            <caption>Show arrows</caption>
+            <category>General</category>
+        <description>Renders a small, touchable arrow at the top of the drawer. Touching the arrow grows and shrinks the drawer.</description>
+        </property>  
+        <property key="content" type="widgets" required="true">
+            <caption>Content</caption>
+            <category>General</category>
+            <description>Content inside the drawer.</description>
+        </property>
+        <property key="startUp" type="boolean" defaultValue="false">
+            <caption>Start open</caption>
+            <category>General</category>
+        <description>Whether the container will start open or closed</description>
+        </property>   
+        <property key="containerHeight" type="integer" defaultValue="500">
+            <caption>Container Height</caption>
+            <category>General</category>
+            <description>Height of the container</description>
+        </property>
+        <property key="downDisplay" type="integer" defaultValue="400">
+            <caption>Amount to shrink</caption>
+            <category>General</category>
+        <description>The vertical distance that the drawer will close compared to the open setting</description>
+        </property>        
+        <property key="offset" type="integer" defaultValue="40">
+            <caption>Offset</caption>
+            <category>General</category>
+            <description>The amount of offset to apply to the drawer's position.
+If the app uses a header and tab navigation, offset should equal the sum of those two components' heights.</description>
+        </property>       
+    </properties>
+</widget>

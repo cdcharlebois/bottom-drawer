@@ -1,0 +1,167 @@
+import React, { Component, createElement } from 'react';
+import PropTypes from 'prop-types';
+import { 
+  View,
+  Dimensions,
+  TouchableOpacity,
+  Text,
+} from 'react-native';
+
+import Animator from './components/Animator';
+
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+
+export class BottomDrawer extends Component{
+  static propTypes = {
+    /**
+     * Height of the drawer. 
+     */
+    containerHeight: PropTypes.number.isRequired,
+
+    /**
+     * The amount of offset to apply to the drawer's position.
+     * If the app uses a header and tab navigation, offset should equal 
+     * the sum of those two components' heights.
+     */
+    offset: PropTypes.number,
+
+    /**
+     * Set to true to have the drawer start in up position.
+     */
+    startUp: PropTypes.bool,
+
+    /**
+     * How much the drawer's down display falls beneath the up display. 
+     * Ex: if set to 20, the down display will be 20 points underneath the up display.
+     */
+    downDisplay: PropTypes.number,
+
+    /**
+     * The background color of the drawer.
+     */
+    backgroundColor: PropTypes.string,
+
+    /**
+     * Set to true to give the top of the drawer rounded edges.
+     */
+    roundedEdges: PropTypes.bool,
+
+    /**
+     * Set to true to give the drawer a shadow.
+     */
+    shadow: PropTypes.bool,
+
+    /**
+     * A callback function triggered when the drawer swiped into up position
+     */
+    onExpanded: PropTypes.func,
+
+    /**
+     * A callback function triggered when the drawer swiped into down position
+     */
+    onCollapsed: PropTypes.func
+  }
+
+  static defaultProps = {
+    offset: 0,
+    startUp: true,
+    backgroundColor: '#ffffff',
+    roundedEdges: true,
+    shadow: true,
+    onExpanded: () => {},
+    onCollapsed: () => {}
+    
+  }
+
+  constructor(props){
+    super(props);
+
+    /**
+     * TOGGLE_THRESHOLD is how much the user has to swipe the drawer
+     * before its position changes between up / down.
+     */
+    this.TOGGLE_THRESHOLD = this.props.containerHeight / 11;
+    this.DOWN_DISPLAY = this.props.downDisplay || this.props.containerHeight / 1.5;
+
+    /**
+     * UP_POSITION and DOWN_POSITION calculate the two (x,y) values for when
+     * the drawer is swiped into up position and down position.
+     */
+    this.UP_POSITION = this._calculateUpPosition(SCREEN_HEIGHT, this.props.containerHeight, this.props.offset)
+    this.DOWN_POSITION = this._calculateDownPosition(this.UP_POSITION, this.DOWN_DISPLAY)
+
+    this.state = { currentPosition: this.props.startUp ? this.UP_POSITION : this.DOWN_POSITION };
+  }
+
+  render() {
+    return (
+      <Animator
+        currentPosition = {this.state.currentPosition}
+        setCurrentPosition = {(position) => this.setCurrentPosition(position)}
+        toggleThreshold = {this.TOGGLE_THRESHOLD}
+        upPosition = {this.UP_POSITION}
+        downPosition = {this.DOWN_POSITION}
+        roundedEdges = {this.props.roundedEdges}
+        shadow = {this.props.shadow}
+        containerHeight = {this.props.containerHeight}
+        backgroundColor = {this.props.backgroundColor}
+        onExpanded = {() => this.props.onExpanded()}
+        onCollapsed = {() => this.props.onCollapsed()}
+      >
+      {this.props.showArrows && this.state.currentPosition === this.DOWN_POSITION &&
+        <View style={{alignItems:"center"}}>
+          <TouchableOpacity onPress={this.invertPosition.bind(this)}>
+              <View style={{flexDirection:"row", marginTop:10, marginBottom:15}}>
+                <View style={{backgroundColor:"#CCC", borderRadius:20, width:20,height:5, marginRight:-3, transform:[{rotateZ: '-30deg'}]}}></View>
+                <View style={{backgroundColor:"#CCC", borderRadius:20, width:20,height:5, marginLeft:-3,transform:[{rotateZ: '30deg'}]}}></View>
+              </View>
+              
+          </TouchableOpacity>
+        </View>
+      }
+      {this.props.showArrows && this.state.currentPosition === this.UP_POSITION &&
+        <View style={{alignItems:"center"}}>
+          <TouchableOpacity onPress={this.invertPosition.bind(this)}>
+              <View style={{flexDirection:"row", marginTop:10, marginBottom:15}}>
+                <View style={{backgroundColor:"#CCC", borderRadius:20, width:20,height:5, marginRight:-3, transform:[{rotateZ: '30deg'}]}}></View>
+                <View style={{backgroundColor:"#CCC", borderRadius:20, width:20,height:5, marginLeft:-3,transform:[{rotateZ: '-30deg'}]}}></View>
+              </View>
+              
+          </TouchableOpacity>
+        </View>
+      }
+      {this.props.showHandle &&
+        <View style={{alignItems:"center", marginTop:10, marginBottom:10}}>
+          <View style={{backgroundColor:"#CCC", borderRadius:20, width:35,height:5}}></View>
+        </View>
+      }
+        {this.props.content}
+
+        <View style={{height: Math.sqrt(SCREEN_HEIGHT), backgroundColor: this.props.backgroundColor, marginLeft:10, marginRight:10}} />
+      </Animator>
+    )
+  }
+
+  setCurrentPosition(position) {
+    this.setState({ currentPosition: position })
+  }
+
+  invertPosition() {
+    const newPosition = this.state.currentPosition === this.UP_POSITION ? this.DOWN_POSITION : this.UP_POSITION;
+    this.setCurrentPosition(newPosition);
+  }
+
+  _calculateUpPosition(screenHeight, containerHeight, offset) {
+    return {
+      x: 0, 
+      y: screenHeight - (containerHeight + offset) 
+    }
+  }
+
+  _calculateDownPosition(upPosition, downDisplay) {
+    return { 
+      x: 0,
+      y: upPosition.y + downDisplay
+    };
+  }
+}
